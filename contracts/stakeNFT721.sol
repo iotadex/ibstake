@@ -7,6 +7,7 @@ import "./interfaces/IIotabeeSwapNFT.sol";
 import "./stakeBase.sol";
 
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract StakeNFT721 is StakeBase, IERC721Receiver {
     /// @dev The minimum tick that may be passed to #getSqrtRatioAtTick computed from log base 1.0001 of 2**-128
@@ -34,6 +35,14 @@ contract StakeNFT721 is StakeBase, IERC721Receiver {
 
     event Stake(address indexed user, uint256 tokenId, uint256 amount, uint8 k);
     event Withdraw(address indexed user, uint256 tokenId);
+    event WithdrawAndMerge(
+        address indexed user,
+        uint128 liquidity,
+        uint256 tokenId,
+        uint256 mergeId,
+        uint256 token0Fee,
+        uint256 token1Fee
+    );
 
     constructor(
         uint8 maxWeeks,
@@ -64,12 +73,19 @@ contract StakeNFT721 is StakeBase, IERC721Receiver {
         nftToken = IIotabeeSwapNFT(nft);
         MAX_TICK = tickMax;
         MIN_TICK = -tickMax;
+
+        IERC20(token0).approve(nft, type(uint256).max);
+        IERC20(token1).approve(nft, type(uint256).max);
     }
 
     /// @dev stake NFT for k weeks
     /// @param tokenId the tokenId of NFT
     /// @param k stake the token for k weeks
-    function stake(uint256 tokenId, uint8 k) external {
+    function stake(
+        uint256 tokenId,
+        uint8 k,
+        uint256 deadline
+    ) external checkDeadline(deadline) {
         require(k > 0 && k <= MAX_WEEKS, "k 1~52");
         require(
             block.timestamp <= END_TIME && block.timestamp >= BEGIN_TIME,
@@ -106,16 +122,11 @@ contract StakeNFT721 is StakeBase, IERC721Receiver {
         emit Stake(msg.sender, tokenId, liquidity, k);
     }
 
-    /// @dev withdraw NFT to the caller, all the tokenIds must be eligible
-    /// @param tokenIds of NFT
-    function withdraw(uint256[] memory tokenIds) external {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            withdraw(tokenIds[i]);
-        }
-    }
-
     /// @dev withdraw NFT to user
-    function withdraw(uint256 tokenId) public {
+    function withdraw(
+        uint256 tokenId,
+        uint256 deadline
+    ) external checkDeadline(deadline) {
         require(stakingNFTs[tokenId].owner == msg.sender, "owner forbidden");
         uint256 weekNumber = block.timestamp / WEEK_SECONDS;
         require(stakingNFTs[tokenId].endNo <= weekNumber, "locked time");
@@ -129,6 +140,83 @@ contract StakeNFT721 is StakeBase, IERC721Receiver {
             }
         }
         emit Withdraw(msg.sender, tokenId);
+    }
+
+    /// @dev withdraw NFT to the caller, all the tokenIds must be unstaked
+    /// @param tokenId id of NFT to withdraw
+    /// @param mergeTokenId id of NFT to merge liquidity
+    function withdrawAndMerge(
+        uint256 tokenId,
+        uint256 mergeTokenId,
+        uint256 deadline
+    ) external checkDeadline(deadline) {
+        //check owner
+        require(stakingNFTs[tokenId].owner == msg.sender, "owner forbidden");
+
+        //check stake state
+        uint256 weekNumber = block.timestamp / WEEK_SECONDS;
+        require(stakingNFTs[tokenId].endNo <= weekNumber, "locked time");
+
+        //check mergeTokenId
+        checkNFT(mergeTokenId);
+        require(nftToken.ownerOf(mergeTokenId) == msg.sender, "m owner f");
+
+        //remove the tokenId from userNFTs
+        uint256[] storage ids = userNFTs[msg.sender];
+        for (uint256 i = 0; i < ids.length; i++) {
+            if (tokenId == ids[i]) {
+                ids[i] = ids[ids.length - 1];
+                ids.pop();
+                break;
+            }
+        }
+
+        //decrease liquidity
+        (, , , , , , , uint128 liquidity, , , , ) = nftToken.positions(tokenId);
+        (uint256 amount0, uint256 amount1) = nftToken.decreaseLiquidity(
+            IIotabeeSwapNFT.DecreaseLiquidityParams(
+                tokenId,
+                liquidity,
+                0,
+                0,
+                deadline
+            )
+        );
+        //collect token0 and token1 to `this` address
+        (uint256 amountTotal0, uint256 amountTotal1) = nftToken.collect(
+            IIotabeeSwapNFT.CollectParams(
+                tokenId,
+                address(this),
+                type(uint128).max,
+                type(uint128).max
+            )
+        );
+        //increase liquidity to the mergeTokenId
+        (liquidity, amount0, amount1) = nftToken.increaseLiquidity(
+            IIotabeeSwapNFT.IncreaseLiquidityParams(
+                mergeTokenId,
+                amount0,
+                amount1,
+                0,
+                0,
+                deadline
+            )
+        );
+        //burn this tokenId
+        nftToken.burn(tokenId);
+
+        //transfer the left token to msg.sender
+        _safeTransfer(token0, msg.sender, amountTotal0 - amount0);
+        _safeTransfer(token1, msg.sender, amountTotal1 - amount1);
+
+        emit WithdrawAndMerge(
+            msg.sender,
+            liquidity,
+            tokenId,
+            mergeTokenId,
+            amountTotal0 - amount0,
+            amountTotal1 - amount1
+        );
     }
 
     /// @dev get all the user's NFTs that are staking
@@ -152,9 +240,9 @@ contract StakeNFT721 is StakeBase, IERC721Receiver {
         return (ids, end);
     }
 
-    /// @dev deposit user's NFT to this contract
-    /// @return liquidity the amount of NFT's liquidity
-    function _deposit(uint256 tokenId) internal returns (uint256) {
+    /// @dev check NFT
+    /// @param tokenId nft token id
+    function checkNFT(uint256 tokenId) internal view returns (uint256) {
         (
             ,
             ,
@@ -177,6 +265,13 @@ contract StakeNFT721 is StakeBase, IERC721Receiver {
             (tickLower == MIN_TICK) && (tickUpper == MAX_TICK),
             "tick range error"
         );
+        return liquidity;
+    }
+
+    /// @dev deposit user's NFT to this contract
+    /// @return liquidity the amount of NFT's liquidity
+    function _deposit(uint256 tokenId) internal returns (uint256) {
+        uint256 liquidity = checkNFT(tokenId);
 
         require(nftToken.getApproved(tokenId) == address(this), "not approve");
         nftToken.safeTransferFrom(msg.sender, address(this), tokenId);
