@@ -30,6 +30,11 @@ contract StakeBase is Ownable {
     event SetReward(address indexed user, uint256 no, uint256 amount);
     event ClaimReward(address indexed user, uint256 amount);
 
+    modifier checkDeadline(uint256 deadline) {
+        require(block.timestamp <= deadline, "over deadline");
+        _;
+    }
+
     constructor(
         uint8 maxWeeks,
         uint256 maxScale,
@@ -51,7 +56,11 @@ contract StakeBase is Ownable {
     /// @dev set rewardToken to this contract, with transfering token
     /// @param no the week number
     /// @param amount the reward amount for rewardToken
-    function setReward(uint256 no, uint256 amount) external {
+    function setReward(
+        uint256 no,
+        uint256 amount,
+        uint256 deadline
+    ) external checkDeadline(deadline) {
         require(msg.sender == owner, "forbidden");
         require(
             block.timestamp <= END_TIME && block.timestamp >= BEGIN_TIME,
@@ -71,8 +80,9 @@ contract StakeBase is Ownable {
     /// @return total total amount of rewards
     function setRewards(
         uint256[] memory nos,
-        uint256[] memory amounts
-    ) external returns (uint256 total) {
+        uint256[] memory amounts,
+        uint256 deadline
+    ) external checkDeadline(deadline) returns (uint256 total) {
         require(msg.sender == owner, "forbidden");
         require(
             block.timestamp <= END_TIME && block.timestamp >= BEGIN_TIME,
@@ -92,13 +102,16 @@ contract StakeBase is Ownable {
         emit SetReward(msg.sender, 0, total);
     }
 
-    function withdrawRewards(uint256 amount) external {
+    function withdrawRewards(
+        uint256 amount,
+        uint256 deadline
+    ) external checkDeadline(deadline) {
         require(msg.sender == owner, "forbidden");
         _safeTransfer(rewardToken, msg.sender, amount);
     }
 
     /// @dev claim all the rewards for user's staking
-    function claimReward() external {
+    function claimReward(uint256 deadline) external checkDeadline(deadline) {
         uint256 weekNumber = block.timestamp / WEEK_SECONDS - LOCK_WEEKNUM;
         uint256 total = 0;
         uint256 updataNo = userCanClaimWeeks[msg.sender][0];

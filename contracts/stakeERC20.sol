@@ -49,7 +49,11 @@ contract StakeERC20 is StakeBase {
     /// @dev stake erc20 token of `amount` for k weeks
     /// @param amount transfer erc20 token to this contract
     /// @param k stake the token for k weeks
-    function stake(uint256 amount, uint8 k) external {
+    function stake(
+        uint256 amount,
+        uint8 k,
+        uint256 deadline
+    ) external checkDeadline(deadline) {
         require(k > 0 && k <= MAX_WEEKS, "k 1~52");
         require(
             block.timestamp <= END_TIME && block.timestamp >= BEGIN_TIME,
@@ -84,7 +88,9 @@ contract StakeERC20 is StakeBase {
 
     /// @dev withdraw token to the caller
     /// @return total the real amount of erc20 token transfered
-    function withdraw() external returns (uint256 total) {
+    function withdraw(
+        uint256 deadline
+    ) external checkDeadline(deadline) returns (uint256 total) {
         uint256 weekNumber = block.timestamp / WEEK_SECONDS;
         uint256 i = userERC20s[msg.sender].length;
         while (userERC20s[msg.sender].length > 0) {
