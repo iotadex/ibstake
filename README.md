@@ -63,3 +63,5 @@ npx hardhat run scripts/deploy.ts
 把nft token 从stake合约发送给用户，需要鉴权调用者是否是合法用户
 提现的nft token中的liquidity全部移除，需要鉴权nft token的拥有者身份，移除的同时执行collect操作，获得ERC20代币
 把移除liquidity的量再通过addLiquidity的方式加到已有的nft token中。
+
+deployed StakeNFT721 to 0x5a501802cc80bD6A64204744B0B5d84101543032

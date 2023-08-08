@@ -20,7 +20,7 @@ contract StakeBase is Ownable {
     // the lastest week number
     uint256 public latestNo;
 
-    uint24 public constant WEEK_SECONDS = 600;
+    uint24 public constant WEEK_SECONDS = 3600;
     uint8 public immutable MAX_WEEKS;
     uint256 public immutable MAX_SCALE;
     uint8 public immutable LOCK_WEEKNUM;
@@ -84,10 +84,10 @@ contract StakeBase is Ownable {
         uint256 deadline
     ) external checkDeadline(deadline) returns (uint256 total) {
         require(msg.sender == owner, "forbidden");
-        require(
-            block.timestamp <= END_TIME && block.timestamp >= BEGIN_TIME,
-            "not in the period"
-        );
+        //        require(
+        //            block.timestamp <= END_TIME && block.timestamp >= BEGIN_TIME,
+        //            "not in the period"
+        //        );
         require(nos.length == amounts.length, "parameters error");
         uint256 lno = 0; // gas saved
         for (uint256 i = 0; i < nos.length; i++) {
@@ -108,6 +108,23 @@ contract StakeBase is Ownable {
     ) external checkDeadline(deadline) {
         require(msg.sender == owner, "forbidden");
         _safeTransfer(rewardToken, msg.sender, amount);
+    }
+
+    function userRewards() internal view returns (uint256, uint256[] memory) {
+        uint256 weekNumber = block.timestamp / WEEK_SECONDS;
+        (uint256 w1, uint256 w2) = (
+            userCanClaimWeeks[msg.sender][0],
+            userCanClaimWeeks[msg.sender][1]
+        );
+        uint256 bE = w2 < weekNumber ? w2 : weekNumber;
+        uint256[] memory amountList = new uint256[](w2 - bE);
+        for (uint256 no = w1; no < bE; no++) {
+            amountList[no - w1] = totalScores[no] == 0
+                ? 0
+                : (rewardsOf[no] * userScores[msg.sender][no]) /
+                    totalScores[no];
+        }
+        return (w1, amountList);
     }
 
     /// @dev claim all the rewards for user's staking

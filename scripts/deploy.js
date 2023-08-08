@@ -26,15 +26,37 @@ async function main() {
           address nft,
           int24 tickMin
   */
+  const weekSeconds = 3600;
   const t0 = "0x1b10CAdebbf96BC2AaA3AFfd78414AB50eCeF571";
   const t1 = "0x39DEE4dFA8A94fB02F4004a38543c853F859d79E";
   const fee = 10000;
-  const NFT = "0xE37Ba409c40d059a81b2402100CA3c7CC2125Ce1";
+  const NFT = "0xA003566666347dB17fd0aD4e47205901A370A51d";
   const tcikMax = 887200;
   const StakeNFT721 = await hre.ethers.getContractFactory("StakeNFT721");
-  const nft = await StakeNFT721.deploy(52, 2, 52, 0, 999999999999999999n, rewardToken, t0, t1, fee, NFT, tcikMax);
+  const beginTime = 1691496000;
+  const endTime = beginTime + 157 * weekSeconds;
+  const nft = await StakeNFT721.deploy(52, 2, 52, beginTime, endTime, rewardToken, t0, t1, fee, NFT, tcikMax);
   await nft.deployed();
   console.log(`deployed StakeNFT721 to ${nft.address}`);
+
+  const erc20 = await hre.ethers.getContractAt("IERC20", rewardToken)
+  const b = await erc20.approve(nft.address, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFn)
+  console.log(`ERC20 approve ${b}`);
+
+  let timestamp = Date.parse(new Date()) / 1000;
+  timestamp = beginTime + weekSeconds;
+  wn = parseInt(timestamp / weekSeconds);
+  var wns = new Array();
+  var rws = new Array();
+  for (var i = 0; i < 156; i++) {
+    wns[i] = wn + i;
+    rws[i] = Math.round((156 - i) ** 1.5 / 122558.3725 * 8000000) * 100000000;
+    //rws[i] = 10000 * 100000000;
+  }
+
+  let now = Date.parse(new Date()) / 1000;
+  const total = await nft.setRewards(wns, rws, now + 300);
+  console.log(`set rewards to nft ${total}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

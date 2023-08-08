@@ -7,13 +7,16 @@
 const hre = require("hardhat");
 
 async function main() {
+    const weekNumber = 3600;
     let timestamp = Date.parse(new Date()) / 1000;
-    wn = parseInt(timestamp / 600);
+    timestamp = 1691496000 + weekNumber;
+    wn = parseInt(timestamp / weekNumber);
     var wns = new Array();
     var rws = new Array();
-    for (var i = 0; i < 1000; i++) {
+    for (var i = 0; i < 156; i++) {
         wns[i] = wn + i;
-        rws[i] = 1000000000000n;
+        rws[i] = Math.round((156 - i) ** 1.5 / 122558.3725 * 8000000) * 100000000;
+        //rws[i] = 10000 * 100000000;
     }
     console.log(`[${wns}]`);
     console.log(`[${rws}]`);
