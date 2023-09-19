@@ -20,7 +20,7 @@ contract StakeBase is Ownable {
     // the lastest week number
     uint256 public latestNo;
 
-    uint24 public constant WEEK_SECONDS = 3600;
+    uint24 public constant WEEK_SECONDS = 604800; // seconds of one week
     uint8 public immutable MAX_WEEKS;
     uint256 public immutable MAX_SCALE;
     uint8 public immutable LOCK_WEEKNUM;

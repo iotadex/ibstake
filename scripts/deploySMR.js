@@ -8,24 +8,6 @@ const hre = require("hardhat");
 
 async function main() {
   const rewardToken = "0x39DEE4dFA8A94fB02F4004a38543c853F859d79E";
-  //  const StakeERC20 = await hre.ethers.getContractFactory("StakeERC20");
-  //  const erc20 = await StakeERC20.deploy(52, 2, 52, 0, 999999999999999999n, rewardToken, "0x406153d92579841835E820Ed2631384CA6910dE0");
-  //  await erc20.deployed();
-  //  console.log(`deployed StakeERC20 to ${erc20.address}`);
-  //  return;
-  /*
-          uint8 maxWeeks,
-          uint256 maxScale,
-          uint8 lockWeeks,
-          uint256 beginTime,
-          uint256 endTime,
-          address _rewardToken,
-          address tokenA,
-          address tokenB,
-          uint24 _fee,
-          address nft,
-          int24 tickMin
-  */
   const weekSeconds = 3600;
   const t0 = "0x1b10CAdebbf96BC2AaA3AFfd78414AB50eCeF571";
   const t1 = "0x39DEE4dFA8A94fB02F4004a38543c853F859d79E";
@@ -33,11 +15,13 @@ async function main() {
   const NFT = "0xA003566666347dB17fd0aD4e47205901A370A51d";
   const tcikMax = 887200;
   const StakeNFT721 = await hre.ethers.getContractFactory("StakeNFT721");
-  const beginTime = 1691496000;
+  const date = new Date('2023.09.06 15:00:00');
+  const beginTime = Date.parse(date) / 1000;
+  console.log(`BeginTime is ${beginTime}`);
   const endTime = beginTime + 157 * weekSeconds;
   const nft = await StakeNFT721.deploy(52, 2, 52, beginTime, endTime, rewardToken, t0, t1, fee, NFT, tcikMax);
   await nft.deployed();
-  console.log(`deployed StakeNFT721 to ${nft.address}`);
+  console.log(`deployed pool(0xE0bE6538F6DCEa1Bd7825f9dBc406D54F100EbCc) StakeNFT721 to ${nft.address}`);
 
   const erc20 = await hre.ethers.getContractAt("IERC20", rewardToken)
   const b = await erc20.approve(nft.address, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFn)

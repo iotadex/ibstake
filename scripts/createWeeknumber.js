@@ -7,6 +7,18 @@
 const hre = require("hardhat");
 
 async function main() {
+    const currOutput = {
+        Amount: 1,
+        Type: 2
+    }
+    console.log(`[${currOutput.Amount}]`);
+    currOutput.Amount = 2;
+    console.log(`[${currOutput.Amount}]`);
+    return;
+    const date = new Date('2023.08.09 20:00:00');
+    const ts = Date.parse(date) / 1000;
+    console.log(`[${ts}]`);
+    return;
     const weekNumber = 3600;
     let timestamp = Date.parse(new Date()) / 1000;
     timestamp = 1691496000 + weekNumber;
