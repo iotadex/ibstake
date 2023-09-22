@@ -15,7 +15,7 @@ async function main() {
   const NFT = "0xA003566666347dB17fd0aD4e47205901A370A51d";
   const tcikMax = 887200;
   const StakeNFT721 = await hre.ethers.getContractFactory("StakeNFT721");
-  const date = new Date('2023.09.06 15:00:00');
+  const date = new Date('2023.09.23 12:00:00');
   const beginTime = Date.parse(date) / 1000;
   console.log(`BeginTime is ${beginTime}`);
   const endTime = beginTime + 157 * weekSeconds;
