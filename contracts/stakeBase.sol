@@ -20,7 +20,7 @@ contract StakeBase is Ownable {
     // the lastest week number
     uint256 public latestNo;
 
-    uint24 public constant WEEK_SECONDS = 604800; // seconds of one week
+    uint24 public constant WEEK_SECONDS = 604800; //604800; // seconds of one week
     uint8 public immutable MAX_WEEKS;
     uint256 public immutable MAX_SCALE;
     uint8 public immutable LOCK_WEEKNUM;
@@ -153,12 +153,12 @@ contract StakeBase is Ownable {
         emit ClaimReward(msg.sender, total);
     }
 
-    function canClaimAmount() public view returns (uint256) {
+    function canClaimAmount(address user) public view returns (uint256) {
         uint256 weekNumber = block.timestamp / WEEK_SECONDS - LOCK_WEEKNUM;
         uint256 total = 0;
         for (
-            uint256 no = userCanClaimWeeks[msg.sender][0];
-            no < userCanClaimWeeks[msg.sender][1];
+            uint256 no = userCanClaimWeeks[user][0];
+            no < userCanClaimWeeks[user][1];
             no++
         ) {
             // cann't be over the locked week number
@@ -168,33 +168,28 @@ contract StakeBase is Ownable {
             if (totalScores[no] == 0) {
                 continue;
             }
-            total +=
-                (rewardsOf[no] * userScores[msg.sender][no]) /
-                totalScores[no];
+            total += (rewardsOf[no] * userScores[user][no]) / totalScores[no];
         }
         return total;
     }
 
-    function lockedRewardAmount()
-        public
-        view
-        returns (uint256, uint256[] memory)
-    {
+    function lockedRewardAmount(
+        address user
+    ) public view returns (uint256, uint256[] memory) {
         uint256 weekNumber = block.timestamp / WEEK_SECONDS - LOCK_WEEKNUM + 1;
-        if (userCanClaimWeeks[msg.sender][1] <= weekNumber) {
+        if (userCanClaimWeeks[user][1] <= weekNumber) {
             return (weekNumber, new uint256[](0));
         }
         (uint256 w1, uint256 w2) = (
-            userCanClaimWeeks[msg.sender][0],
-            userCanClaimWeeks[msg.sender][1]
+            userCanClaimWeeks[user][0],
+            userCanClaimWeeks[user][1]
         );
         uint256 bI = w1 > weekNumber ? w1 : weekNumber;
         uint256[] memory amountList = new uint256[](w2 - bI);
         for (uint256 no = bI; no < w2; no++) {
             amountList[no - bI] = totalScores[no] == 0
                 ? 0
-                : (rewardsOf[no] * userScores[msg.sender][no]) /
-                    totalScores[no];
+                : (rewardsOf[no] * userScores[user][no]) / totalScores[no];
         }
         uint256 first = LOCK_WEEKNUM + bI - block.timestamp / WEEK_SECONDS;
         return (first, amountList);

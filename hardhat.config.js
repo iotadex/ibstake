@@ -15,6 +15,10 @@ module.exports = {
   },
   defaultNetwork: "smrevm1072",
   networks: {
+    smr_main: {
+      url: "https://json-rpc.evm.shimmer.network",
+      accounts: [process.env.BRIDGE_PRIVATEKEY]
+    },
     smrevm1072: {
       url: "https://json-rpc.evm.testnet.shimmer.network",
       accounts: [process.env.RMS_CONTRACT_PRIVATEKEY],
