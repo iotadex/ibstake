@@ -53,7 +53,7 @@ contract StakeBase is Ownable {
         owner = msg.sender;
     }
 
-    /// @dev set rewardToken to this contract, with transfering token
+    /// @dev set rewardToken to this contract
     /// @param no the week number
     /// @param amount the reward amount for rewardToken
     function setReward(
@@ -62,15 +62,14 @@ contract StakeBase is Ownable {
         uint256 deadline
     ) external checkDeadline(deadline) {
         require(msg.sender == owner, "forbidden");
-        _safeTransferFrom(rewardToken, msg.sender, address(this), amount);
-        rewardsOf[no] += amount;
+        rewardsOf[no] = amount;
         if (no > latestNo) {
             latestNo = no;
         }
         emit SetReward(msg.sender, no, amount);
     }
 
-    /// @dev set rewardToken to this contract, with transfering token
+    /// @dev set rewardToken to this contract
     /// @param nos the week numbers
     /// @param amounts the reward amounts for rewardToken
     function setRewards(
