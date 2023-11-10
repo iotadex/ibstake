@@ -64,4 +64,4 @@ npx hardhat run scripts/deploy.ts
 提现的nft token中的liquidity全部移除，需要鉴权nft token的拥有者身份，移除的同时执行collect操作，获得ERC20代币
 把移除liquidity的量再通过addLiquidity的方式加到已有的nft token中。
 
-deployed StakeNFT721 to 0xe508186146108817FC6E5c8bcF7bFF57C52c7068
+l^2 = s * s * p

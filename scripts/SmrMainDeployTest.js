@@ -14,7 +14,7 @@ async function main() {
     const NFT = "0x5f0E8A90f8093aBddF0cA21898B2A71350754a0D";
     const tcikMax = 887200;
     const StakeNFT721 = await hre.ethers.getContractFactory("StakeNFT721");
-    const date = new Date('2023.09.28 12:00:00');
+    const date = new Date('2023.09.30 16:00:00');
     const beginTime = Date.parse(date) / 1000;
     console.log(`BeginTime is ${beginTime}`);
     const endTime = beginTime + 157 * weekSeconds;
@@ -29,7 +29,6 @@ async function main() {
         rws[i] = Math.round((156 - i) ** 1.5 / 122558.3725 * 8000000) * 100000000;
     }
 
-
     var t0 = "0x1F8E35099025EE03c89872D80CBb082ce2aBF632";
     var t1 = "0x3E3c8701EF91299F235B29535A28B94Ec02236E9";
     let nft = await StakeNFT721.deploy(52, 2, 52, beginTime, endTime, rewardToken, t0, t1, fee, NFT, tcikMax);
@@ -43,7 +42,7 @@ async function main() {
     let total = await nft.setRewards(wns, rws, now + 300);
     console.log(`set rewards to nft ${total}`);
 
-
+    return
 
     t0 = "0x0F6Fd00E015080E8D8180D263d1E82270D00F500";
     t1 = "0x1F8E35099025EE03c89872D80CBb082ce2aBF632";

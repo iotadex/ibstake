@@ -20,7 +20,7 @@ contract StakeBase is Ownable {
     // the lastest week number
     uint256 public latestNo;
 
-    uint24 public constant WEEK_SECONDS = 604800; //604800; // seconds of one week
+    uint24 public constant WEEK_SECONDS = 604800; // seconds of one week
     uint8 public immutable MAX_WEEKS;
     uint256 public immutable MAX_SCALE;
     uint8 public immutable LOCK_WEEKNUM;
@@ -62,10 +62,6 @@ contract StakeBase is Ownable {
         uint256 deadline
     ) external checkDeadline(deadline) {
         require(msg.sender == owner, "forbidden");
-        require(
-            block.timestamp <= END_TIME && block.timestamp >= BEGIN_TIME,
-            "not in the period"
-        );
         _safeTransferFrom(rewardToken, msg.sender, address(this), amount);
         rewardsOf[no] += amount;
         if (no > latestNo) {
@@ -84,10 +80,6 @@ contract StakeBase is Ownable {
         uint256 deadline
     ) external checkDeadline(deadline) returns (uint256 total) {
         require(msg.sender == owner, "forbidden");
-        //        require(
-        //            block.timestamp <= END_TIME && block.timestamp >= BEGIN_TIME,
-        //            "not in the period"
-        //        );
         require(nos.length == amounts.length, "parameters error");
         uint256 lno = 0; // gas saved
         for (uint256 i = 0; i < nos.length; i++) {
@@ -98,16 +90,7 @@ contract StakeBase is Ownable {
             }
         }
         latestNo = lno;
-        _safeTransferFrom(rewardToken, msg.sender, address(this), total);
         emit SetReward(msg.sender, 0, total);
-    }
-
-    function withdrawRewards(
-        uint256 amount,
-        uint256 deadline
-    ) external checkDeadline(deadline) {
-        require(msg.sender == owner, "forbidden");
-        _safeTransfer(rewardToken, msg.sender, amount);
     }
 
     function userRewards() internal view returns (uint256, uint256[] memory) {

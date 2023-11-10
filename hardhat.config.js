@@ -17,7 +17,7 @@ module.exports = {
   networks: {
     smr_main: {
       url: "https://json-rpc.evm.shimmer.network",
-      accounts: [process.env.BRIDGE_PRIVATEKEY]
+      accounts: [process.env.SOON_FARMING]
     },
     smrevm1072: {
       url: "https://json-rpc.evm.testnet.shimmer.network",
