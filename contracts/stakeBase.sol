@@ -73,24 +73,21 @@ contract StakeBase is Ownable {
     /// @dev set rewardToken to this contract, with transfering token
     /// @param nos the week numbers
     /// @param amounts the reward amounts for rewardToken
-    /// @return total total amount of rewards
     function setRewards(
         uint256[] memory nos,
         uint256[] memory amounts,
         uint256 deadline
-    ) external checkDeadline(deadline) returns (uint256 total) {
+    ) external checkDeadline(deadline) {
         require(msg.sender == owner, "forbidden");
         require(nos.length == amounts.length, "parameters error");
         uint256 lno = 0; // gas saved
         for (uint256 i = 0; i < nos.length; i++) {
-            total += amounts[i];
             rewardsOf[nos[i]] = amounts[i];
             if (nos[i] > lno) {
                 lno = nos[i];
             }
         }
         latestNo = lno;
-        emit SetReward(msg.sender, 0, total);
     }
 
     function userRewards() internal view returns (uint256, uint256[] memory) {
