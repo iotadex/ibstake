@@ -45,6 +45,7 @@ contract StakeNFT721 is StakeBase, IERC721Receiver {
     );
 
     constructor(
+        uint24 weekSeconds,
         uint8 maxWeeks,
         uint256 maxScale,
         uint8 lockWeeks,
@@ -58,6 +59,7 @@ contract StakeNFT721 is StakeBase, IERC721Receiver {
         int24 tickMax
     )
         StakeBase(
+            weekSeconds,
             maxWeeks,
             maxScale,
             lockWeeks,

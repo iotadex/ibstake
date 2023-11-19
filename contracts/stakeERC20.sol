@@ -26,6 +26,7 @@ contract StakeERC20 is StakeBase {
     event Withdraw(address indexed user, uint256 amount);
 
     constructor(
+        uint24 weekSeconds,
         uint8 maxWeeks,
         uint256 maxScale,
         uint8 lockWeeks,
@@ -35,6 +36,7 @@ contract StakeERC20 is StakeBase {
         address _lpToken
     )
         StakeBase(
+            weekSeconds,
             maxWeeks,
             maxScale,
             lockWeeks,

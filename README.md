@@ -65,3 +65,4 @@ npx hardhat run scripts/deploy.ts
 把移除liquidity的量再通过addLiquidity的方式加到已有的nft token中。
 
 l^2 = s * s * p
+

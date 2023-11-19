@@ -20,7 +20,7 @@ contract StakeBase is Ownable {
     // the lastest week number
     uint256 public latestNo;
 
-    uint24 public constant WEEK_SECONDS = 604800; // seconds of one week
+    uint24 public immutable WEEK_SECONDS; // 604800, seconds of one week
     uint8 public immutable MAX_WEEKS;
     uint256 public immutable MAX_SCALE;
     uint8 public immutable LOCK_WEEKNUM;
@@ -36,6 +36,7 @@ contract StakeBase is Ownable {
     }
 
     constructor(
+        uint24 weekSeconds,
         uint8 maxWeeks,
         uint256 maxScale,
         uint8 lockWeeks,
@@ -44,6 +45,7 @@ contract StakeBase is Ownable {
         address _rewardToken
     ) {
         rewardToken = _rewardToken;
+        WEEK_SECONDS = weekSeconds;
         MAX_WEEKS = maxWeeks;
         MAX_SCALE = maxScale;
         LOCK_WEEKNUM = lockWeeks;
