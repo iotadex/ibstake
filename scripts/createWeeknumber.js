@@ -7,22 +7,25 @@
 const hre = require("hardhat");
 
 async function main() {
-    const date = new Date('2023.11.15 22:30:00');
+    const date = new Date('2023.11.24 03:00:00');
     const beginTime = Date.parse(date) / 1000;
     console.log(`[${beginTime}]`);
     const weekNumber = 18000;
     const endTime = beginTime + 157 * weekNumber;
     console.log(`[${endTime}]`);
-    let timestamp = Date.parse(new Date()) / 1000;
-    timestamp = beginTime + weekNumber;
+    let timestamp = beginTime + weekNumber;
     wn = parseInt(timestamp / weekNumber);
     var wns = new Array();
     var rws = new Array();
+    var total = 0n; 
     for (var i = 0; i < 156; i++) {
         wns[i] = wn + i;
-        rws[i] = BigInt(Math.round((156 - i) ** 1.5 / 122558.3725 * 12000)) * 1000000000000000000n;
+        rws[i] = BigInt(Math.round((156 - i) ** 1.5 / 122558.3725 * 120000000)) * 100000000000000n;
+        //rws[i] = 200000000n * 10000000000000000n / 156n;
+        total += rws[i];
     }
     console.log(`[${wns}]`);
+    console.log(`${total}`);
     console.log(`[${rws}]`);
     return;
 }
@@ -33,3 +36,5 @@ main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
 });
+// 12000000100000000000000
+//       97900000000000000

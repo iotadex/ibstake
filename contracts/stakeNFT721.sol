@@ -48,7 +48,7 @@ contract StakeNFT721 is StakeBase, IERC721Receiver {
         uint24 weekSeconds,
         uint8 maxWeeks,
         uint256 maxScale,
-        uint8 lockWeeks,
+        uint16 lockWeeks,
         uint256 beginTime,
         uint256 endTime,
         address _rewardToken,

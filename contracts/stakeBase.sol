@@ -23,7 +23,7 @@ contract StakeBase is Ownable {
     uint24 public immutable WEEK_SECONDS; // 604800, seconds of one week
     uint8 public immutable MAX_WEEKS;
     uint256 public immutable MAX_SCALE;
-    uint8 public immutable LOCK_WEEKNUM;
+    uint16 public immutable LOCK_WEEKNUM;
     uint256 public immutable BEGIN_TIME;
     uint256 public immutable END_TIME;
 
@@ -39,7 +39,7 @@ contract StakeBase is Ownable {
         uint24 weekSeconds,
         uint8 maxWeeks,
         uint256 maxScale,
-        uint8 lockWeeks,
+        uint16 lockWeeks,
         uint256 beginTime,
         uint256 endTime,
         address _rewardToken
