@@ -20,7 +20,7 @@ async function main() {
     var total = 0n; 
     for (var i = 0; i < 156; i++) {
         wns[i] = wn + i;
-        rws[i] = BigInt(Math.round((156 - i) ** 1.5 / 122558.3725 * 120000000)) * 100000000000000n;
+        rws[i] = BigInt(Math.round((156 - i) ** 1.5 / 122558.3725 * 12000000000));
         //rws[i] = 200000000n * 10000000000000000n / 156n;
         total += rws[i];
     }

@@ -18,9 +18,9 @@ async function main() {
     wn = parseInt(timestamp / weekSeconds);
     var wns = new Array();
     var rws = new Array();
-    for (var i = 0; i < 8; i++) {
+    for (var i = 8; i < 12; i++) {
         wns[i] = wn + i;
-        rws[i] = Math.round((156 - i) ** 1.5 / 122558.3725 * 8000000) * 1000000;
+        rws[i] = Math.round((156 - i) ** 1.5 / 122558.3725 * 8000000 * 1000000);
     }
     console.log(`${wns}`);
     console.log(`${rws}`);
