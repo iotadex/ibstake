@@ -4,6 +4,7 @@
 pragma solidity =0.8.17;
 
 import "./ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract Reward is Ownable {
     // token address, to set by the owner
@@ -42,6 +43,13 @@ contract Reward is Ownable {
 
         userClaimed[msg.sender] = block.timestamp;
         _safeTransfer(rewardToken, msg.sender, rewardAmount);
+    }
+
+    function addUser(address[] memory _users) external{
+        require(msg.sender == owner, "forbidden");
+        for (uint256 i = 0; i < _users.length; i++) {
+            users[_users[i]] = true;
+        }
     }
 
     /// @dev safe tranfer erc20 token frome address(this) to address
