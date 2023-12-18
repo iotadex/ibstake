@@ -70,7 +70,7 @@ Claim Contract:
 
 
 
-# 1. LP Addresses, 99SMR/Addr
+# 1. LP Addresses, 99SMR/Addr, 99000000000000000000
 ```
     0x2a9c2Db382dc3de136C39257d0aEc886E43da2FA
     0x987d83af72AFe343e1A7bafaF968c8340bEe3EfA
