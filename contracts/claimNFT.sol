@@ -4,11 +4,11 @@
 pragma solidity =0.8.17;
 
 import "./ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
 contract Reward is Ownable {
     // token address, to set by the owner
-    IERC721 public immutable nftToken;
+    IERC1155 public immutable nftToken;
     uint256[] public tokenids; 
 
     // reward amount for one time
@@ -34,7 +34,7 @@ contract Reward is Ownable {
             users[_users[i]] = true;
         }
         rewardAmount = _rewardAmount;
-        nftToken = IERC721(_rewardToken);
+        nftToken = IERC1155(_rewardToken);
         owner = msg.sender;
     }
 
@@ -45,7 +45,7 @@ contract Reward is Ownable {
         userClaimed[msg.sender] = block.timestamp;
         uint256 tokenid = tokenids[tokenids.length-1];
         tokenids.pop();
-        nftToken.safeTransferFrom(address(this), msg.sender, tokenid);
+        nftToken.safeTransferFrom(address(this), msg.sender, tokenid, 0, "");
     }
 
     function addTokenIds(uint256[] memory ids) external{
