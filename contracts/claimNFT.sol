@@ -40,7 +40,7 @@ contract Reward is Ownable {
 
     function claim() external{
         require(users[msg.sender], "user forbidden");
-        require(userClaimed[msg.sender] > 0, "claimed");
+        require(userClaimed[msg.sender] == 0, "claimed");
 
         userClaimed[msg.sender] = block.timestamp;
         uint256 tokenid = tokenids[tokenids.length-1];
