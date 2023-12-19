@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 contract Reward is Ownable {
     // token address, to set by the owner
     IERC1155 public immutable nftToken;
-    uint256[] public tokenids; 
+    uint256 public immutable itemID;
 
     // reward amount for one time
     uint256 public immutable rewardAmount;
@@ -28,13 +28,15 @@ contract Reward is Ownable {
     constructor(
         address[] memory _users,
         uint256 _rewardAmount,
-        address _rewardToken
+        address _rewardToken,
+        uint256 _tokenid
     ) {
         for (uint256 i = 0; i < _users.length; i++) {
             users[_users[i]] = true;
         }
         rewardAmount = _rewardAmount;
         nftToken = IERC1155(_rewardToken);
+        itemID = _tokenid;
         owner = msg.sender;
     }
 
@@ -43,16 +45,7 @@ contract Reward is Ownable {
         require(userClaimed[msg.sender] == 0, "claimed");
 
         userClaimed[msg.sender] = block.timestamp;
-        uint256 tokenid = tokenids[tokenids.length-1];
-        tokenids.pop();
-        nftToken.safeTransferFrom(address(this), msg.sender, tokenid, 0, "");
-    }
-
-    function addTokenIds(uint256[] memory ids) external{
-        require(msg.sender == owner, "forbidden");
-        for (uint256 i=0;i<ids.length;i++){
-            tokenids.push(ids[i]);
-        }
+        nftToken.safeTransferFrom(address(this), msg.sender, itemID, 1, "");
     }
 
     function addUser(address[] memory _users) external{
