@@ -11,9 +11,6 @@ contract Reward is Ownable {
     IERC1155 public immutable nftToken;
     uint256 public immutable itemID;
 
-    // reward amount for one time
-    uint256 public immutable rewardAmount;
-
     // user -> claimed timestamp
     mapping(address => uint256) public userClaimed;
 
@@ -27,14 +24,12 @@ contract Reward is Ownable {
 
     constructor(
         address[] memory _users,
-        uint256 _rewardAmount,
         address _rewardToken,
         uint256 _tokenid
     ) {
         for (uint256 i = 0; i < _users.length; i++) {
             users[_users[i]] = true;
         }
-        rewardAmount = _rewardAmount;
         nftToken = IERC1155(_rewardToken);
         itemID = _tokenid;
         owner = msg.sender;
